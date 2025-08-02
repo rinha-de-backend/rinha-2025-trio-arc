@@ -1,0 +1,73 @@
+services:
+  backend-1:
+    build:
+      context: .
+      dockerfile: build/Dockerfile
+    container_name: backend-1
+    hostname: backend-1
+    depends_on:
+      - redis
+    networks:
+      - payment-processor
+    environment:
+      - PROCESSOR_DEFAULT_URL=http://payment-processor-default:8080
+      - PROCESSOR_FALLBACK_URL=http://payment-processor-fallback:8080
+    deploy:
+      resources:
+        limits:
+          cpus: '0.6'
+          memory: '80MB'
+
+  backend-2:
+    build:
+      context: .
+      dockerfile: build/Dockerfile
+    container_name: backend-2
+    hostname: backend-2
+    depends_on:
+      - redis
+    networks:
+      - payment-processor
+    environment:
+      - PROCESSOR_DEFAULT_URL=http://payment-processor-default:8080
+      - PROCESSOR_FALLBACK_URL=http://payment-processor-fallback:8080
+    deploy:
+      resources:
+        limits:
+          cpus: '0.6'
+          memory: '80MB'
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    hostname: nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - backend-1
+      - backend-2
+    ports:
+      - "9999:9999"
+    networks:
+      - payment-processor
+    deploy:
+      resources:
+        limits:
+          cpus: '0.15'
+          memory: '30MB'
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    hostname: redis
+    networks:
+      - payment-processor
+    deploy:
+      resources:
+        limits:
+          cpus: '0.15'
+          memory: '30MB'
+
+networks:
+  payment-processor:
+    external: true
