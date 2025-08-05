@@ -2,7 +2,7 @@ services:
   backend-1:
     build:
       context: .
-      dockerfile: build/Dockerfile
+      dockerfile: ./deploy/docker/Dockerfile
     container_name: backend-1
     hostname: backend-1
     depends_on:
@@ -21,7 +21,7 @@ services:
   backend-2:
     build:
       context: .
-      dockerfile: build/Dockerfile
+      dockerfile: ./deploy/docker/Dockerfile
     container_name: backend-2
     hostname: backend-2
     depends_on:
@@ -42,7 +42,7 @@ services:
     container_name: nginx
     hostname: nginx
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./deploy/nginx/nginx.conf:/etc/nginx/nginx.conf
     depends_on:
       - backend-1
       - backend-2
